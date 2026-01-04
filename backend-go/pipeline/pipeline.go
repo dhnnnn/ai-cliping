@@ -1,10 +1,12 @@
 package pipeline
 
 import (
+	"fmt"
 	"log"
-	"time"
+	"path/filepath"
 
 	"ai-clipping-backend/models"
+	"ai-clipping-backend/utils"
 )
 
 func StartWorker(jobChan <-chan *models.Job) {
@@ -17,18 +19,23 @@ func process(job *models.Job) {
 	log.Println("Processing job:", job.ID)
 	job.Status = models.StatusProcessing
 
-	// STEP 1: Download video (yt-dlp)
-	time.Sleep(2 * time.Second)
+	videoPath := filepath.Join("storage", "videos", job.ID+".%(ext)s")
 
-	// STEP 2: Extract audio (ffmpeg)
-	time.Sleep(1 * time.Second)
+	err := utils.RunCommand(
+		"./yt-dlp.exe",
+		"-f", "bestvideo+bestaudio/best",
+		"--merge-output-format", "mp4",
+		"-o", videoPath,
+		job.URL,
+	)
 
-	// STEP 3: Call AI worker (Python)
-	time.Sleep(2 * time.Second)
 
-	// STEP 4: Clip video
-	time.Sleep(1 * time.Second)
+	if err != nil {
+		job.Status = models.StatusFailed
+		job.Result = "download failed"
+		return
+	}
 
 	job.Status = models.StatusDone
-	job.Result = "clips/generated"
+	job.Result = fmt.Sprintf("video saved at %s", videoPath)
 }
