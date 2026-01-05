@@ -3,10 +3,12 @@ package models
 type JobStatus string
 
 const (
-	StatusQueued     JobStatus = "queued"
-	StatusProcessing JobStatus = "processing"
-	StatusDone       JobStatus = "done"
-	StatusFailed     JobStatus = "failed"
+	StatusQueued         = "queued"
+	StatusDownloading    = "downloading"
+	StatusDownloaded     = "downloaded"
+	StatusAudioExtract   = "audio_extracting"
+	StatusAudioReady     = "audio_ready"
+	StatusFailed         = "failed"
 )
 
 type Job struct {
