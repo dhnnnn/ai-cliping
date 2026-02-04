@@ -22,6 +22,9 @@ storage/videos/*.webm
 storage/audio/*.wav
 storage/audio/*.mp3
 storage/audio/*.aac
+storage/transcripts/*.json
+storage/clips/*.mp4
+storage/clips/*.webm
 
 # Keep the .gitkeep files
 !storage/*/.gitkeep

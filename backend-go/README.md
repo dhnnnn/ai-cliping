@@ -101,25 +101,58 @@ go build -o ai-clipping-backend.exe
 **Request Body:**
 ```json
 {
-  "url": "https://www.youtube.com/watch?v=example"
+  "url": "https://www.youtube.com/watch?v=example",
+  "videoType": "tutorial",
+  "preferences": {
+    "minDuration": 15,
+    "maxDuration": 60,
+    "maxClips": 5,
+    "aspectRatio": "9:16"
+  }
 }
 ```
+
+**Field Descriptions:**
+- `url` (required): URL video yang akan diproses
+- `videoType` (optional): Jenis video untuk optimasi highlight detection
+  - `"tutorial"` - Video pembelajaran/edukasi
+  - `"gaming"` - Video gaming/streaming
+  - `"podcast"` - Podcast/interview
+  - `"general"` - General purpose (default)
+- `preferences` (optional): Pengaturan clip output
+  - `minDuration`: Durasi minimum clip (detik), default: 15
+  - `maxDuration`: Durasi maksimum clip (detik), default: 60
+  - `maxClips`: Jumlah maksimum clip yang dihasilkan, default: 5
+  - `aspectRatio`: Aspect ratio output, default: "9:16"
 
 **Response:**
 ```json
 {
-  "ID": "550e8400-e29b-41d4-a716-446655440000",
-  "URL": "https://www.youtube.com/watch?v=example",
-  "Status": "queued",
-  "Result": ""
+  "id": "550e8400-e29b-41d4-a716-446655440000",
+  "url": "https://www.youtube.com/watch?v=example",
+  "status": "queued",
+  "result": "",
+  "videoType": "tutorial",
+  "preferences": {
+    "minDuration": 15,
+    "maxDuration": 60,
+    "maxClips": 5,
+    "aspectRatio": "9:16"
+  }
 }
 ```
 
 **Contoh menggunakan curl:**
 ```bash
+# Simple request dengan default settings
 curl -X POST http://localhost:8080/api/process \
   -H "Content-Type: application/json" \
   -d "{\"url\":\"https://www.youtube.com/watch?v=dQw4w9WgXcQ\"}"
+
+# Request dengan video type dan custom preferences
+curl -X POST http://localhost:8080/api/process \
+  -H "Content-Type: application/json" \
+  -d "{\"url\":\"https://www.youtube.com/watch?v=dQw4w9WgXcQ\",\"videoType\":\"gaming\",\"preferences\":{\"minDuration\":20,\"maxDuration\":45,\"maxClips\":3}}"
 ```
 
 ### 2. Check Status (Get Job Status)
@@ -147,8 +180,13 @@ curl http://localhost:8080/api/status/550e8400-e29b-41d4-a716-446655440000
 2. **downloading** - Sedang mengunduh video
 3. **downloaded** - Video berhasil diunduh
 4. **audio_extracting** - Sedang mengekstrak audio
-5. **audio_ready** - Audio berhasil diekstrak ✅
-6. **failed** - Proses gagal ❌
+5. **audio_ready** - Audio berhasil diekstrak
+6. **transcribing** - Sedang transcribe audio ke text (Whisper) 🆕
+7. **transcribed** - Transcription selesai 🆕
+8. **analyzing** - Sedang menganalisis highlights 🆕
+9. **clipping** - Sedang memotong video 🆕
+10. **completed** - Semua proses selesai ✅
+11. **failed** - Proses gagal ❌
 
 ## 📁 Struktur Project / Project Structure
 
@@ -163,19 +201,26 @@ backend-go/
 │   └── pipeline.go   # Worker untuk proses video
 ├── queue/            # Job queue management
 │   └── queue.go      # Queue implementation
+├── scripts/          # Python scripts 🆕
+│   └── transcribe.py # Whisper transcription script
 ├── server/           # HTTP server setup
 │   └── server.go     # Route configuration
 ├── storage/          # Output storage
 │   ├── videos/       # Downloaded videos
-│   └── audio/        # Extracted audio files
+│   ├── audio/        # Extracted audio files
+│   ├── transcripts/  # Transcription JSON files 🆕
+│   └── clips/        # Generated video clips 🆕
 ├── utils/            # Utility functions
 │   ├── command.go    # Command execution helper
-│   └── ffmpeg.go     # FFmpeg audio extraction
+│   ├── ffmpeg.go     # FFmpeg audio extraction
+│   └── transcribe.go # Whisper wrapper 🆕
 ├── ffmpeg.exe        # FFmpeg binary
 ├── yt-dlp.exe        # yt-dlp binary
 ├── go.mod            # Go module definition
 ├── go.sum            # Dependency checksums
-└── main.go           # Application entry point
+├── main.go           # Application entry point
+├── README.md         # Main documentation
+└── WHISPER_SETUP.md  # Whisper installation guide 🆕
 ```
 
 ## ⚙️ Konfigurasi / Configuration

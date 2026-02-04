@@ -1,0 +1,158 @@
+{
+	"info": {
+		"name": "AI Clipping Backend API",
+		"description": "API collection for testing AI video clipping backend with Whisper transcription",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "1. Process Video (Simple)",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"url\": \"https://www.youtube.com/watch?v=dQw4w9WgXcQ\"\n}"
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/process",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"process"
+					]
+				},
+				"description": "Submit video for processing with default settings (general video type, 9:16 format, 15-60s clips)"
+			},
+			"response": []
+		},
+		{
+			"name": "2. Process Video (Tutorial)",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"url\": \"https://www.youtube.com/watch?v=dQw4w9WgXcQ\",\n  \"videoType\": \"tutorial\"\n}"
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/process",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"process"
+					]
+				},
+				"description": "Submit tutorial video for processing"
+			},
+			"response": []
+		},
+		{
+			"name": "3. Process Video (Gaming)",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"url\": \"https://www.youtube.com/watch?v=dQw4w9WgXcQ\",\n  \"videoType\": \"gaming\",\n  \"preferences\": {\n    \"minDuration\": 20,\n    \"maxDuration\": 45,\n    \"maxClips\": 3,\n    \"aspectRatio\": \"9:16\"\n  }\n}"
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/process",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"process"
+					]
+				},
+				"description": "Submit gaming video with custom clip preferences"
+			},
+			"response": []
+		},
+		{
+			"name": "4. Process Video (Podcast)",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"url\": \"https://www.youtube.com/watch?v=dQw4w9WgXcQ\",\n  \"videoType\": \"podcast\",\n  \"preferences\": {\n    \"minDuration\": 30,\n    \"maxDuration\": 90,\n    \"maxClips\": 5,\n    \"aspectRatio\": \"9:16\"\n  }\n}"
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/process",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"process"
+					]
+				},
+				"description": "Submit podcast/interview video with longer clips"
+			},
+			"response": []
+		},
+		{
+			"name": "5. Check Job Status",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/api/status/{{job_id}}",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"status",
+						"{{job_id}}"
+					]
+				},
+				"description": "Check the status of a job. Replace {{job_id}} with actual job ID from process response.\n\nStatus flow:\n- queued → downloading → downloaded → audio_extracting → audio_ready → transcribing → transcribed → analyzing → clipping → completed"
+			},
+			"response": []
+		}
+	],
+	"variable": [
+		{
+			"key": "job_id",
+			"value": "paste-job-id-here",
+			"type": "string"
+		}
+	]
+}

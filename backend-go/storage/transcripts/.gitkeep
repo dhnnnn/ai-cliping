@@ -1,0 +1,2 @@
+# This file ensures the transcripts folder exists in git
+# Transcript JSON files will be ignored by .gitignore

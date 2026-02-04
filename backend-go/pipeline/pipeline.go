@@ -54,5 +54,34 @@ func process(job *models.Job) {
 		return
 	}
 	job.Status = models.StatusAudioReady
-	job.Result = fmt.Sprintf("video saved at %s, audio at %s", videoPath, audioPath)
+	log.Printf("Job %s: audio extracted successfully", job.ID)
+
+	// 3. Transcribe audio using Whisper
+	job.Status = models.StatusTranscribing
+	log.Printf("Job %s: starting transcription", job.ID)
+
+	transcript, err := utils.TranscribeAudio(audioPath, "base")
+	if err != nil {
+		job.Status = models.StatusFailed
+		job.Result = fmt.Sprintf("transcription failed: %v", err)
+		log.Printf("Job %s failed at transcription: %v", job.ID, err)
+		return
+	}
+
+	job.Transcript = transcript
+	job.Status = models.StatusTranscribed
+	log.Printf("Job %s: transcription completed, %d segments", job.ID, len(transcript))
+
+	// Save transcript to JSON file
+	transcriptPath := filepath.Join("storage", "transcripts", job.ID+".json")
+	log.Printf("Job %s: saving transcript to %s", job.ID, transcriptPath)
+
+	if err := utils.SaveTranscript(transcript, transcriptPath); err != nil {
+		log.Printf("Job %s: WARNING - Failed to save transcript file: %v", job.ID, err)
+		// Don't fail the job, transcript is already in job.Transcript field
+	} else {
+		log.Printf("Job %s: transcript file saved successfully", job.ID)
+	}
+
+	job.Result = fmt.Sprintf("video saved at %s, audio at %s, transcript at %s", videoPath, audioPath, transcriptPath)
 }
