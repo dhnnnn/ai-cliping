@@ -5,17 +5,18 @@ import (
 	"log"
 	"path/filepath"
 
+	"ai-clipping-backend/analysis"
 	"ai-clipping-backend/models"
 	"ai-clipping-backend/utils"
 )
 
-func StartWorker(jobChan <-chan *models.Job) {
+func StartWorker(jobChan <-chan *models.Job, geminiAPIKey string) {
 	for job := range jobChan {
-		process(job)
+		process(job, geminiAPIKey)
 	}
 }
 
-func process(job *models.Job) {
+func process(job *models.Job, geminiAPIKey string) {
 	log.Println("Processing job:", job.ID)
 	job.Status = models.StatusDownloading
 
@@ -78,10 +79,41 @@ func process(job *models.Job) {
 
 	if err := utils.SaveTranscript(transcript, transcriptPath); err != nil {
 		log.Printf("Job %s: WARNING - Failed to save transcript file: %v", job.ID, err)
-		// Don't fail the job, transcript is already in job.Transcript field
 	} else {
 		log.Printf("Job %s: transcript file saved successfully", job.ID)
 	}
 
-	job.Result = fmt.Sprintf("video saved at %s, audio at %s, transcript at %s", videoPath, audioPath, transcriptPath)
+	// 4. Analyze highlights using Gemini
+	if geminiAPIKey != "" {
+		job.Status = models.StatusAnalyzing
+		log.Printf("Job %s: starting highlight analysis with Gemini", job.ID)
+
+		analyzer := analysis.NewGeminiAnalyzer(geminiAPIKey, job.VideoType, job.Preferences)
+		highlights, err := analyzer.FindHighlights(transcript)
+
+		if err != nil {
+			log.Printf("Job %s: WARNING - Gemini analysis failed: %v", job.ID, err)
+			// Don't fail the job, just skip highlights
+		} else {
+			job.Highlights = highlights
+			log.Printf("Job %s: found %d highlights", job.ID, len(highlights))
+
+			// Save highlights to JSON file
+			highlightsPath := filepath.Join("storage", "highlights", job.ID+".json")
+			log.Printf("Job %s: saving highlights to %s", job.ID, highlightsPath)
+
+			if err := utils.SaveHighlights(highlights, highlightsPath); err != nil {
+				log.Printf("Job %s: WARNING - Failed to save highlights file: %v", job.ID, err)
+			} else {
+				log.Printf("Job %s: highlights file saved successfully", job.ID)
+			}
+		}
+	} else {
+		log.Printf("Job %s: Skipping highlight analysis (no Gemini API key)", job.ID)
+	}
+
+	job.Status = models.StatusCompleted
+	job.Result = fmt.Sprintf("Processing complete: video at %s, audio at %s, transcript at %s, %d highlights found",
+		videoPath, audioPath, transcriptPath, len(job.Highlights))
+	log.Printf("Job %s: completed successfully", job.ID)
 }

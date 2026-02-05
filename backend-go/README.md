@@ -35,7 +35,22 @@ _Make sure you have installed:_
 - _Go 1.25.5 or newer_
 - _Git (optional, for cloning repository)_
 
-## 🚀 Instalasi / Installation
+## � Dokumentasi / Documentation
+
+**➡️ Dokumentasi lengkap ada di folder [`docs/`](docs/INDEX.md)**
+
+Quick links:
+- 🚀 **[Quick Start: Gemini AI](docs/QUICK_START_GEMINI.md)** - Setup 5 menit
+- 🔧 **[Gemini Setup Guide](docs/GEMINI_SETUP.md)** - Konfigurasi API lengkap
+- 🧪 **[Testing Guide](docs/TESTING_GUIDE.md)** - Cara testing dengan Postman
+- 📁 **[Saved Files Structure](docs/SAVED_FILES.md)** - Lokasi hasil processing
+- 🐛 **[Troubleshooting](docs/DEBUG_ENV.md)** - Fix common issues
+
+**Full index:** [`docs/INDEX.md`](docs/INDEX.md)
+
+---
+
+## �🚀 Instalasi / Installation
 
 ### 1. Clone atau Download Project
 

@@ -43,5 +43,8 @@ Thumbs.db
 # Cookies file (if using cookies for yt-dlp)
 cookies.txt
 
+# Environment variables (API keys)
+.env
+
 # Logs
 *.log

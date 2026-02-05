@@ -101,3 +101,24 @@ func SaveTranscript(segments []models.TranscriptSegment, filePath string) error 
 
 	return nil
 }
+
+// SaveHighlights saves highlight analysis results to a JSON file
+func SaveHighlights(highlights []models.Highlight, filePath string) error {
+	data, err := json.MarshalIndent(highlights, "", "  ")
+	if err != nil {
+		return fmt.Errorf("failed to marshal highlights: %v", err)
+	}
+
+	file, err := os.Create(filePath)
+	if err != nil {
+		return fmt.Errorf("failed to create file: %v", err)
+	}
+	defer file.Close()
+
+	_, err = file.Write(data)
+	if err != nil {
+		return fmt.Errorf("failed to write file: %v", err)
+	}
+
+	return nil
+}
