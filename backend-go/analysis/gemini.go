@@ -54,8 +54,6 @@ func (ga *GeminiAnalyzer) FindHighlights(transcript []models.TranscriptSegment) 
 
 	prompt := ga.buildPrompt(transcript)
 
-	log.Printf("Sending transcript to Gemini API for analysis (video type: %s)", ga.videoType)
-
 	// Generate content
 	resp, err := model.GenerateContent(ctx, genai.Text(prompt))
 	if err != nil {
