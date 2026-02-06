@@ -119,7 +119,7 @@ func process(job *models.Job, geminiAPIKey string) {
 	log.Printf("Job %s: completed successfully", job.ID)
 }
 
-// createClips generates video clips from highlights with optional subtitles
+// createClips generates video clips from highlights without subtitles
 func createClips(job *models.Job, videoPath string) ([]string, error) {
 	// Create clips in job-specific subfolder for better organization
 	clipDir := filepath.Join("storage", "clips", job.ID)
@@ -137,22 +137,17 @@ func createClips(job *models.Job, videoPath string) ([]string, error) {
 		clipConfig.AspectRatio = job.Preferences.AspectRatio
 	}
 
-	// Enable subtitles by default
-	subConfig := utils.DefaultSubtitleConfig()
-
 	var clipPaths []string
 	for i, highlight := range job.Highlights {
 		outputPath := filepath.Join(clipDir, fmt.Sprintf("clip_%d.mp4", i+1))
 
-		// Create clip with burned-in subtitles
-		err := utils.CreateClipWithSubtitles(
+		// Create clip without subtitles
+		err := utils.CreateClip(
 			videoPath,
 			outputPath,
 			highlight.Start,
 			highlight.End,
-			job.Transcript,
 			clipConfig,
-			subConfig,
 		)
 
 		if err != nil {
