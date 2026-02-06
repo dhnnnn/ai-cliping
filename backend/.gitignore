@@ -1,0 +1,51 @@
+# Binaries for programs and plugins
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# Test binary, built with `go test -c`
+*.test
+
+# Output of the go coverage tool
+*.out
+
+# Go workspace file
+go.work
+
+# Storage files - ignore all media files but keep the folders
+storage/videos/*.mp4
+storage/videos/*.avi
+storage/videos/*.mkv
+storage/videos/*.webm
+storage/audio/*.wav
+storage/audio/*.mp3
+storage/audio/*.aac
+storage/transcripts/*.json
+storage/highlights/*.json
+storage/clips/*/*.mp4
+storage/clips/*/*.webm
+
+# Keep the .gitkeep files
+!storage/*/.gitkeep
+
+# IDE and Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Cookies file (if using cookies for yt-dlp)
+cookies.txt
+
+# Environment variables (API keys)
+.env
+
+# Logs
+*.log
