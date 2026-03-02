@@ -21,7 +21,6 @@ RUN CGO_ENABLED=0 GOOS=linux go build -o ai-clipping-backend .
 FROM ubuntu:22.04
 
 ENV DEBIAN_FRONTEND=noninteractive
-ENV PORT=8080
 
 WORKDIR /app
 
