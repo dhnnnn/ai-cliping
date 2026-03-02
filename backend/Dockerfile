@@ -1,7 +1,8 @@
 # ─────────────────────────────────────────────
 # Stage 1: Build Go binary
+# Pakai golang:latest agar selalu dapat versi terbaru
 # ─────────────────────────────────────────────
-FROM golang:1.25-alpine AS builder
+FROM golang:latest AS builder
 
 WORKDIR /app
 
@@ -16,18 +17,15 @@ RUN CGO_ENABLED=0 GOOS=linux go build -o ai-clipping-backend .
 
 # ─────────────────────────────────────────────
 # Stage 2: Runtime image
-# Pakai Ubuntu 22.04 — repo lebih stabil di cloud
 # ─────────────────────────────────────────────
 FROM ubuntu:22.04
 
-# Nonaktifkan interactive prompt saat install
 ENV DEBIAN_FRONTEND=noninteractive
-# Default PORT — Railway akan override nilai ini dengan nilai yang benar
 ENV PORT=8080
 
 WORKDIR /app
 
-# Step 1: Install system packages (ffmpeg, python3, curl)
+# Install ffmpeg, python3, pip, curl
 RUN apt-get update && apt-get install -y \
     ffmpeg \
     python3 \
@@ -36,19 +34,14 @@ RUN apt-get update && apt-get install -y \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
-# Step 2: Install Python packages
-# faster-whisper = lebih ringan dari openai-whisper
+# Install Python packages
 RUN pip3 install --no-cache-dir \
     yt-dlp \
     faster-whisper
 
-# Copy Go binary dari stage builder
 COPY --from=builder /app/ai-clipping-backend .
-
-# Copy Python scripts
 COPY scripts/ ./scripts/
 
-# Buat folder storage
 RUN mkdir -p storage/videos storage/audio storage/transcripts storage/highlights storage/clips
 
 EXPOSE 8080
