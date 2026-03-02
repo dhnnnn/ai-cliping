@@ -4,15 +4,13 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/google/uuid"
-
 	"ai-clipping-backend/models"
 	"ai-clipping-backend/queue"
 )
 
 type ProcessRequest struct {
 	URL         string                  `json:"url"`
-	VideoType   models.VideoType        `json:"videoType"`   // optional, default to "general"
+	VideoType   models.VideoType        `json:"videoType"`   // optional, default "general"
 	Preferences *models.ClipPreferences `json:"preferences"` // optional
 }
 
@@ -20,20 +18,25 @@ func ProcessHandler(q *queue.JobQueue) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var req ProcessRequest
 		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-			http.Error(w, "invalid request", http.StatusBadRequest)
+			http.Error(w, "invalid request body", http.StatusBadRequest)
 			return
 		}
 
-		// Set defaults
+		if req.URL == "" {
+			http.Error(w, "url is required", http.StatusBadRequest)
+			return
+		}
+
+		// Set default video type
 		if req.VideoType == "" {
 			req.VideoType = models.VideoTypeGeneral
 		}
 
+		// Set default preferences jika tidak diberikan
 		var prefs models.ClipPreferences
 		if req.Preferences != nil {
 			prefs = *req.Preferences
 		} else {
-			// Default preferences for 9:16 vertical clips
 			prefs = models.ClipPreferences{
 				MinDuration: 15,
 				MaxDuration: 60,
@@ -42,16 +45,15 @@ func ProcessHandler(q *queue.JobQueue) http.HandlerFunc {
 			}
 		}
 
-		job := &models.Job{
-			ID:          uuid.NewString(),
-			URL:         req.URL,
-			Status:      models.StatusQueued,
-			VideoType:   req.VideoType,
-			Preferences: prefs,
+		// Tambahkan job ke antrian (enqueue ke Redis via Asynq)
+		job, err := q.Add(r.Context(), req.URL, req.VideoType, prefs)
+		if err != nil {
+			http.Error(w, "failed to enqueue job: "+err.Error(), http.StatusInternalServerError)
+			return
 		}
 
-		q.Add(job)
-
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusAccepted) // 202 Accepted
 		json.NewEncoder(w).Encode(job)
 	}
 }

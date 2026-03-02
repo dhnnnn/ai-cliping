@@ -9,7 +9,7 @@ import (
 	"ai-clipping-backend/queue"
 )
 
-// JobResponse is the API response without the full transcript (too large)
+// JobResponse adalah response API tanpa field transcript (terlalu besar)
 type JobResponse struct {
 	ID          string                 `json:"id"`
 	URL         string                 `json:"url"`
@@ -24,13 +24,19 @@ type JobResponse struct {
 func StatusHandler(q *queue.JobQueue) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		id := strings.TrimPrefix(r.URL.Path, "/api/status/")
-		job, ok := q.Get(id)
+		if id == "" {
+			http.Error(w, "job id is required", http.StatusBadRequest)
+			return
+		}
+
+		// Ambil job dari Redis store
+		job, ok := q.Get(r.Context(), id)
 		if !ok {
 			http.Error(w, "job not found", http.StatusNotFound)
 			return
 		}
 
-		// Create response without transcript (transcript available in file)
+		// Buat response tanpa transcript (transcript tersedia di file)
 		response := JobResponse{
 			ID:          job.ID,
 			URL:         job.URL,
@@ -42,6 +48,7 @@ func StatusHandler(q *queue.JobQueue) http.HandlerFunc {
 			ClipPaths:   job.ClipPaths,
 		}
 
+		w.Header().Set("Content-Type", "application/json")
 		json.NewEncoder(w).Encode(response)
 	}
 }
