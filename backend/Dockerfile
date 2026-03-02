@@ -22,6 +22,8 @@ FROM ubuntu:22.04
 
 # Nonaktifkan interactive prompt saat install
 ENV DEBIAN_FRONTEND=noninteractive
+# Default PORT — Railway akan override nilai ini dengan nilai yang benar
+ENV PORT=8080
 
 WORKDIR /app
 
