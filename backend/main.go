@@ -2,11 +2,13 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"net/http"
 	"net/url"
 	"os"
 	"strconv"
+	"strings"
 
 	"ai-clipping-backend/pipeline"
 	"ai-clipping-backend/queue"
@@ -31,7 +33,11 @@ func main() {
 	}
 
 	workerCount := getenvInt("WORKER_COUNT", 3)
-	httpPort := getenv("PORT", ":8080")
+
+	// Railway inject PORT tanpa titik dua (misal: "8080")
+	// http.ListenAndServe butuh format ":8080"
+	rawPort := getenv("PORT", "8080")
+	httpPort := fmt.Sprintf(":%s", strings.TrimPrefix(rawPort, ":"))
 
 	// ── Setup Redis ───────────────────────────────────────────────────────
 	// Railway menyediakan REDIS_URL secara otomatis.
