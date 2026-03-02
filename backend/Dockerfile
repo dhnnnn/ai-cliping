@@ -5,7 +5,6 @@ FROM golang:1.24-alpine AS builder
 
 WORKDIR /app
 
-# Alpine pakai apk
 RUN apk add --no-cache git
 
 COPY go.mod go.sum ./
@@ -24,16 +23,17 @@ ENV DEBIAN_FRONTEND=noninteractive
 
 WORKDIR /app
 
-# Ubuntu pakai apt-get
+# Step 1: Install system packages (ffmpeg, python3, pip, curl, nodejs)
 RUN apt-get update && apt-get install -y \
     ffmpeg \
     python3 \
     python3-pip \
     curl \
+    nodejs \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
-# Install Python packages
+# Step 2: Install Python packages
 RUN pip3 install --no-cache-dir \
     yt-dlp \
     faster-whisper
@@ -41,6 +41,7 @@ RUN pip3 install --no-cache-dir \
 COPY --from=builder /app/ai-clipping-backend .
 COPY scripts/ ./scripts/
 
+# Pastikan folder storage ada
 RUN mkdir -p storage/videos storage/audio storage/transcripts storage/highlights storage/clips
 
 EXPOSE 8080
