@@ -21,6 +21,8 @@ import (
 )
 
 func main() {
+	log.Println("[Main] 🚀 Starting application...")
+
 	// Load .env jika ada
 	if err := godotenv.Load(); err != nil {
 		log.Println("[Main] No .env file found, using environment variables")

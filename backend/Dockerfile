@@ -23,7 +23,7 @@ ENV DEBIAN_FRONTEND=noninteractive
 
 WORKDIR /app
 
-# Step 1: Install system packages (ffmpeg, python3, pip, curl, nodejs)
+# Install system packages (ffmpeg, python3, pip, curl, nodejs)
 RUN apt-get update && apt-get install -y \
     ffmpeg \
     python3 \
@@ -33,7 +33,7 @@ RUN apt-get update && apt-get install -y \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
-# Step 2: Install Python packages
+# Install Python packages
 RUN pip3 install --no-cache-dir \
     yt-dlp \
     faster-whisper
@@ -44,9 +44,8 @@ COPY scripts/ ./scripts/
 # Pastikan folder storage ada
 RUN mkdir -p storage/videos storage/audio storage/transcripts storage/highlights storage/clips
 
+# Port yang diekspos
 EXPOSE 8080
 
-HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
-    CMD curl -f http://localhost:${PORT:-8080}/health || exit 1
-
+# Jalankan binary
 CMD ["./ai-clipping-backend"]
