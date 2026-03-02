@@ -1,11 +1,11 @@
 # ─────────────────────────────────────────────
-# Stage 1: Build Go binary
-# Pakai golang:latest agar selalu dapat versi terbaru
+# Stage 1: Build Go binary (Pakai Alpine)
 # ─────────────────────────────────────────────
-FROM golang:latest AS builder
+FROM golang:1.22-alpine AS builder
 
 WORKDIR /app
 
+# Alpine pakai apk
 RUN apk add --no-cache git
 
 COPY go.mod go.sum ./
@@ -16,7 +16,7 @@ COPY . .
 RUN CGO_ENABLED=0 GOOS=linux go build -o ai-clipping-backend .
 
 # ─────────────────────────────────────────────
-# Stage 2: Runtime image
+# Stage 2: Runtime image (Biar hemat storage & stabil)
 # ─────────────────────────────────────────────
 FROM ubuntu:22.04
 
@@ -24,7 +24,7 @@ ENV DEBIAN_FRONTEND=noninteractive
 
 WORKDIR /app
 
-# Install ffmpeg, python3, pip, curl
+# Ubuntu pakai apt-get
 RUN apt-get update && apt-get install -y \
     ffmpeg \
     python3 \
