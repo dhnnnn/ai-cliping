@@ -71,6 +71,11 @@ func (q *JobQueue) Get(ctx context.Context, id string) (*models.Job, bool) {
 	return q.jobStore.Get(ctx, id)
 }
 
+// Update menyimpan ulang job ke Redis (mis. setelah upload ke YouTube)
+func (q *JobQueue) Update(ctx context.Context, job *models.Job) error {
+	return q.jobStore.UpdateJob(ctx, job)
+}
+
 // Close menutup koneksi Asynq client
 func (q *JobQueue) Close() error {
 	return q.client.Close()

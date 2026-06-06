@@ -15,6 +15,7 @@ import (
 	"ai-clipping-backend/server"
 	"ai-clipping-backend/store"
 	"ai-clipping-backend/tasks"
+	"ai-clipping-backend/youtube"
 
 	"github.com/hibiken/asynq"
 	"github.com/joho/godotenv"
@@ -83,8 +84,17 @@ func main() {
 		}
 	}()
 
+	// ── Setup YouTube Uploader (opsional) ─────────────────────────────────
+	ytUploader, err := youtube.NewUploader()
+	if err != nil {
+		log.Printf("[Main] WARNING: YouTube upload disabled: %v", err)
+		ytUploader = nil
+	} else {
+		log.Println("[Main] ✅ YouTube uploader configured")
+	}
+
 	// ── Jalankan HTTP Server ──────────────────────────────────────────────
-	handler := server.NewServer(jobQueue)
+	handler := server.NewServer(jobQueue, ytUploader)
 	log.Printf("[Main] 🌐 HTTP server running on %s", httpPort)
 	log.Fatal(http.ListenAndServe(httpPort, handler))
 }

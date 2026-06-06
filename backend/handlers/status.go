@@ -19,6 +19,7 @@ type JobResponse struct {
 	Preferences models.ClipPreferences `json:"preferences"`
 	Highlights  []models.Highlight     `json:"highlights,omitempty"`
 	ClipPaths   []string               `json:"clipPaths,omitempty"`
+	Uploads     []models.UploadRecord  `json:"uploads,omitempty"`
 }
 
 func StatusHandler(q *queue.JobQueue) http.HandlerFunc {
@@ -46,6 +47,7 @@ func StatusHandler(q *queue.JobQueue) http.HandlerFunc {
 			Preferences: job.Preferences,
 			Highlights:  job.Highlights,
 			ClipPaths:   job.ClipPaths,
+			Uploads:     job.Uploads,
 		}
 
 		w.Header().Set("Content-Type", "application/json")

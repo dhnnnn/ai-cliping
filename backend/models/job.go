@@ -57,4 +57,16 @@ type Job struct {
 	Transcript  []TranscriptSegment `json:"transcript,omitempty"`
 	Highlights  []Highlight         `json:"highlights,omitempty"`
 	ClipPaths   []string            `json:"clipPaths,omitempty"`
+	Uploads     []UploadRecord      `json:"uploads,omitempty"`
+}
+
+// UploadRecord mencatat hasil upload sebuah clip ke YouTube
+type UploadRecord struct {
+	ClipPath   string `json:"clipPath"`
+	Status     string `json:"status"` // "uploading" | "uploaded" | "failed"
+	VideoID    string `json:"videoId,omitempty"`
+	URL        string `json:"url,omitempty"`
+	Title      string `json:"title"`
+	Error      string `json:"error,omitempty"`
+	UploadedAt string `json:"uploadedAt,omitempty"` // RFC3339, diisi saat sukses
 }

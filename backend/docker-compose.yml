@@ -30,6 +30,10 @@ services:
       WORKER_COUNT: "3"
       PORT: ":8080"
       GEMINI_API_KEY: ${GEMINI_API_KEY}
+      # YouTube Data API v3 (OAuth2)
+      YOUTUBE_CLIENT_ID: ${YOUTUBE_CLIENT_ID}
+      YOUTUBE_CLIENT_SECRET: ${YOUTUBE_CLIENT_SECRET}
+      YOUTUBE_REDIRECT_URL: ${YOUTUBE_REDIRECT_URL:-http://localhost:8080/api/youtube/callback}
     volumes:
       # Simpan hasil (video, audio, clips, dll) di host biar nggak hilang saat container di-restart
       - ./storage:/app/storage

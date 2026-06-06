@@ -47,5 +47,8 @@ cookies.txt
 # Environment variables (API keys)
 .env
 
+# YouTube OAuth token (kredensial sensitif - JANGAN di-commit)
+storage/youtube_token.json
+
 # Logs
 *.log
