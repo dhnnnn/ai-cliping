@@ -72,7 +72,7 @@ func CreateClip(inputVideo, outputPath string, start, end float64, config ClipCo
 	)
 
 	// Execute FFmpeg - use same path format as ffmpeg.go
-	return RunCommand("./ffmpeg.exe", args...)
+	return RunCommand(FFmpegBinary(), args...)
 }
 
 // buildVideoFilter creates video filter string for aspect ratio conversion

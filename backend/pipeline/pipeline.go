@@ -75,13 +75,22 @@ func (p *VideoProcessor) process(ctx context.Context, job *models.Job) error {
 	updateStatus(models.StatusDownloading, "")
 	videoPath := filepath.Join("storage", "videos", job.ID+".mp4")
 
-	err := utils.RunCommand(
-		ytDLPBinary(),
-		"-f", "bestvideo[height<=1080]+bestaudio/best[height<=1080]",
-		"--merge-output-format", "mp4",
-		"-o", videoPath,
-		job.URL,
-	)
+	err := func() error {
+		args := []string{
+			"-f", "bestvideo[height<=1080]+bestaudio/best[height<=1080]",
+			"--merge-output-format", "mp4",
+			"-o", videoPath,
+		}
+
+		// Jika ada cookies.txt di root, gunakan untuk bypass bot detection
+		if _, err := os.Stat("cookies.txt"); err == nil {
+			args = append(args, "--cookies", "cookies.txt")
+			log.Println("[Worker] 🍪 Using cookies.txt for download")
+		}
+
+		args = append(args, job.URL)
+		return utils.RunCommand(ytDLPBinary(), args...)
+	}()
 	if err != nil {
 		updateStatus(models.StatusFailed, fmt.Sprintf("Download failed: %v", err))
 		log.Printf("[Worker] Job %s failed at download: %v", job.ID, err)

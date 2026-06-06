@@ -1,0 +1,27 @@
+# Binary Windows lokal (di container pakai versi Linux dari apt/pip)
+ffmpeg.exe
+yt-dlp.exe
+*.exe
+
+# Hasil build Go lokal
+ai-clipping-backend
+
+# Storage (video/audio/clip besar, jangan masuk image)
+storage/videos/*
+storage/audio/*
+storage/transcripts/*
+storage/highlights/*
+storage/clips/*
+!storage/**/.gitkeep
+
+# Env & secrets (di-inject via docker-compose environment)
+.env
+
+# Misc
+.git
+.gitignore
+docs
+*.md
+docker-compose.yml
+Dockerfile
+.dockerignore

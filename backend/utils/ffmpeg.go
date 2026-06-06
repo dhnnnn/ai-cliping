@@ -2,7 +2,7 @@ package utils
 
 func ExtractAudio(videoPath, audioPath string) error {
 	return RunCommand(
-		"./ffmpeg.exe",
+		FFmpegBinary(),
 		"-y",
 		"-i", videoPath,
 		"-vn",

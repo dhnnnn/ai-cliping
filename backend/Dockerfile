@@ -23,18 +23,18 @@ ENV DEBIAN_FRONTEND=noninteractive
 
 WORKDIR /app
 
-# Install system packages (ffmpeg, python3, pip, curl, nodejs)
-RUN apt-get update && apt-get install -y \
+# Install system packages (ffmpeg + python untuk transcribe & yt-dlp)
+RUN apt-get update && apt-get install -y --no-install-recommends \
     ffmpeg \
     python3 \
     python3-pip \
-    curl \
-    nodejs \
+    ca-certificates \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
-# Install Python packages
-RUN pip3 install --no-cache-dir \
+# Install Python packages (yt-dlp untuk download, faster-whisper untuk transcribe)
+RUN pip3 install --no-cache-dir --upgrade pip && \
+    pip3 install --no-cache-dir \
     yt-dlp \
     faster-whisper
 
