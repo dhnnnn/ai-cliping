@@ -42,6 +42,7 @@ type Highlight struct {
 	Start    float64  `json:"start"`
 	End      float64  `json:"end"`
 	Score    float64  `json:"score"`
+	Title    string   `json:"title"`    // AI-generated, catchy title siap diupload ke YouTube/TikTok
 	Reason   string   `json:"reason"`   // e.g., "keyword_match", "volume_spike"
 	Keywords []string `json:"keywords"` // matched keywords if any
 }

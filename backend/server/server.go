@@ -20,5 +20,10 @@ func NewServer(q *queue.JobQueue) http.Handler {
 	mux.HandleFunc("/api/process", handlers.ProcessHandler(q))
 	mux.HandleFunc("/api/status/", handlers.StatusHandler(q))
 
+	// Serve file hasil (clips, dll) dari folder storage.
+	// Contoh akses: GET /storage/clips/<job-id>/01 - Judul.mp4
+	fs := http.FileServer(http.Dir("storage"))
+	mux.Handle("/storage/", http.StripPrefix("/storage/", fs))
+
 	return mux
 }

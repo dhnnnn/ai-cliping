@@ -106,6 +106,7 @@ INSTRUCTIONS:
 3. Each highlight should be self-contained and understandable on its own
 4. Ensure highlights are between %d and %d seconds long
 5. Avoid silence or filler words
+6. For each highlight, write a CATCHY, click-worthy TITLE (max 70 characters) ready to be used directly as the video title when uploaded to YouTube Shorts / TikTok / Reels. Write the title in the SAME LANGUAGE as the transcript. Make it engaging but not clickbait-lying.
 
 OUTPUT FORMAT (JSON only, no explanation):
 [
@@ -113,6 +114,7 @@ OUTPUT FORMAT (JSON only, no explanation):
     "start": 10.5,
     "end": 25.3,
     "score": 85,
+    "title": "Catchy ready-to-upload video title here",
     "reason": "Brief description why this is interesting",
     "keywords": ["key", "words", "found"]
   }
@@ -226,6 +228,11 @@ func (ga *GeminiAnalyzer) parseResponse(resp *genai.GenerateContentResponse) ([]
 		// Ensure non-negative start time
 		if highlights[i].Start < 0 {
 			highlights[i].Start = 0
+		}
+
+		// Fallback title jika Gemini tidak mengisi
+		if strings.TrimSpace(highlights[i].Title) == "" {
+			highlights[i].Title = fmt.Sprintf("Highlight %d", i+1)
 		}
 	}
 

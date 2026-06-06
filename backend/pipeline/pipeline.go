@@ -190,8 +190,22 @@ func createClips(job *models.Job, videoPath string) ([]string, error) {
 	}
 
 	var clipPaths []string
+	usedNames := make(map[string]bool)
 	for i, highlight := range job.Highlights {
-		outputPath := filepath.Join(clipDir, fmt.Sprintf("clip_%d.mp4", i+1))
+		// Pakai judul dari AI sebagai nama file (sudah di-sanitize agar aman)
+		baseName := utils.SanitizeFilename(highlight.Title)
+
+		// Prefix nomor urut biar clip terurut & nama tetap unik
+		fileName := fmt.Sprintf("%02d - %s", i+1, baseName)
+
+		// Jaga-jaga kalau ada judul yang sama persis
+		candidate := fileName
+		for n := 2; usedNames[candidate]; n++ {
+			candidate = fmt.Sprintf("%s (%d)", fileName, n)
+		}
+		usedNames[candidate] = true
+
+		outputPath := filepath.Join(clipDir, candidate+".mp4")
 
 		err := utils.CreateClip(videoPath, outputPath, highlight.Start, highlight.End, clipConfig)
 		if err != nil {
